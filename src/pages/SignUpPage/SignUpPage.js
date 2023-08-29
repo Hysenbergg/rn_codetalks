@@ -22,6 +22,13 @@ const SignUpPage = ({navigation}) => {
       });
       return;
     }
+    if(email === '' || password === '') {
+      showMessage({
+        message: 'Eksik alan girdiniz. Tekrar deneyiniz.',
+        type: 'danger'
+      })
+      return;
+    }
     try {
       setLoading(true);
       await auth()

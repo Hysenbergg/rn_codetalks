@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, ScrollView, Alert} from 'react-native';
 import styles from './CodeChatPage.style';
 import MessageCard from '../../components/MessageCard/MessageCard';
 import FloatingButton from '../../components/FloatingButton/FloatingButton';
@@ -7,6 +7,8 @@ import CustomModal from '../../components/CustomModal/CustomModal';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import ParseContentData from '../../utils/ParseContentData';
+import {colors} from '../../styles/colors';
+import {showMessage} from 'react-native-flash-message';
 
 const CodeChatPage = ({route, navigation}) => {
   const [data, setData] = React.useState([]);
@@ -20,11 +22,49 @@ const CodeChatPage = ({route, navigation}) => {
       const contentData = snapshot.val();
       const parsedData = ParseContentData(contentData || {});
       setData(parsedData);
-    })
+    });
     navigation.setOptions({
-      title: room.room_name
-    })
-  }, [])
+      title: room.room_name,
+    });
+  }, []);
+
+  // veritabanından gelen mesaj yoksa yani boşsa gösterilecek ve doluysa mesaj kutularının gösterileceği comp.
+  const renderMessageList = () => {
+    if (data.length === 0) {
+      return (
+        <View style={styles.empty_message_container}>
+          <Text style={styles.empty_message}>
+            Henüz mesaj yazılmadı ilk mesajı yazmak ister misiniz?
+          </Text>
+        </View>
+      );
+    } else {
+      return data.map((item, index) => (
+        <MessageCard
+          key={index}
+          username={item.userName}
+          date={item.date}
+          message={item.message}
+          onPress={() => {
+            DenemeFunction(item.id, room.id)
+          }}
+        />
+      ));
+    }
+  };
+
+  const DenemeFunction = (id, room_id) => {
+    const messageRef = database().ref(`rooms/${room_id}/messages/${id}`);
+    messageRef
+      .remove()
+      .then(() =>
+        showMessage({
+          message: 'Mesaj silindi.',
+          type: 'success',
+        }),
+      )
+      .catch(error => console.log(error));
+  };
 
   const handleInputToggle = () => {
     setVisible(!visible);
@@ -51,12 +91,7 @@ const CodeChatPage = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.title_container}>
-        <Text style={styles.info}>{room.room_name} odası kuruldu!</Text>
-      </View>
-      <FlatList data={data} keyExtractor={item => item.id} renderItem={({item}) => (
-        <MessageCard username={item.userName} date={item.date} message={item.message} />
-      )} />
+      <ScrollView>{renderMessageList()}</ScrollView>
       <FloatingButton onPress={handleInputToggle} />
       <CustomModal
         visible={visible}
@@ -64,6 +99,7 @@ const CodeChatPage = ({route, navigation}) => {
         onSend={handleSendTitle}
         onClose={handleInputToggle}
       />
+      
     </View>
   );
 };

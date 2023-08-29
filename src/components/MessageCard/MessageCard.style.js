@@ -10,15 +10,20 @@ export default StyleSheet.create({
     },
     inner_container: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10
+        marginBottom: 10,
+        alignItems: 'center',
     },
     username: {
-        fontSize: 16
+        fontSize: 16,
+        flex: 1,
+        marginLeft: 5
     },
     message: {
         fontSize: 18,
         color: colors.black,
         fontWeight: '600'
+    },
+    date: {
+        marginRight: 5
     }
 })

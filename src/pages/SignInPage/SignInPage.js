@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, Alert} from 'react-native';
 import styles from './SignInPage.style';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import CustomButton from '../../components/CustomButton/CustomButton';
@@ -13,6 +13,15 @@ const SignInPage = ({navigation}) => {
   const [loading, setLoading] = React.useState(false);
 
   const handleLogin = async () => {
+
+    // giriş inputları boşsa
+    if(email === '' || password === ''){
+      showMessage({
+        message: 'Eksik bir giriş yaptınız! Tekrar Deneyiniz.',
+        type: 'danger'
+      })
+      return;
+    }
     try {
       setLoading(true);
       await auth()

@@ -1,12 +1,12 @@
 import React from 'react';
-import {View, FlatList} from 'react-native';
+import {View, FlatList } from 'react-native';
 import styles from './RoomsPage.style';
 import FloatingButton from '../../components/FloatingButton/FloatingButton';
 import RoomCard from '../../components/RoomCard/RoomCard';
-import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import CustomModal from '../../components/CustomModal/CustomModal';
 import ParseContentData from '../../utils/ParseContentData';
+import { showMessage } from 'react-native-flash-message';
 
 const RoomsPage = ({navigation}) => {
   const [data, setData] = React.useState([]);
@@ -40,6 +40,19 @@ const RoomsPage = ({navigation}) => {
     }
   };
 
+  // Odayı silme işlemi.
+  const handleDeleteRoom = (id) => {
+    const roomRef = database().ref(`rooms/${id}`);
+    roomRef.remove().then(() => (
+      showMessage({
+        message: 'Oda başarılı bir şekilde silindi.',
+        type: 'success'
+      })
+    )).catch(error => {
+      console.log('error: ' + error.code);
+    })
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -49,9 +62,9 @@ const RoomsPage = ({navigation}) => {
           <RoomCard
             title={item.room_name}
             onPress={() => navigation.navigate('ChatCode', {room: item})}
+            onDelete={() => handleDeleteRoom(item.id)}
           />
         )}
-        numColumns={2}
       />
       <FloatingButton onPress={handleInputToggle} />
       <CustomModal

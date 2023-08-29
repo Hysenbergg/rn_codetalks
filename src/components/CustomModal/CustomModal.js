@@ -1,11 +1,16 @@
 import React from 'react';
-import {View, Text, TextInput} from 'react-native';
+import {View, TextInput} from 'react-native';
 import Modal from 'react-native-modal';
 import CustomButton from '../CustomButton/CustomButton';
 import styles from './CustomModal.style';
 
 const CustomModal = ({visible, placeholder, onSend, onClose}) => {
   const [text, setText] = React.useState('');
+
+  const handleSubmit = () => {
+    onSend(text);
+    setText('');
+  }
 
   return (
     <Modal
@@ -26,7 +31,7 @@ const CustomModal = ({visible, placeholder, onSend, onClose}) => {
             autoCapitalize='none'
           />
         </View>
-        <CustomButton title="Ekle" onPress={() => onSend(text)} />
+        <CustomButton title="Ekle" onPress={handleSubmit} />
       </View>
     </Modal>
   );
